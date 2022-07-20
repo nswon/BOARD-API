@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/css/board.css}">
+</head>
+<body>
+<!--헤더부분-->
+<div th:insert="common/header.html" id="header"></div>
+
+<!--단건조회부분-->
+<h1 th:text="${detailBoard.title}"></h1>
+<p th:inline="text">작성일 : [[${#temporals.format(detailBoard.createdDate, 'yyyy-MM-dd HH:mm')}]]</p>
+<p th:text="${detailBoard.content}"></p>
+
+<div class="btn-group" role="group" aria-label="Basic example">
+    <a th:href="@{'/board/edit/' + ${detailBoard.id}}">
+        <button type="button" class="btn btn-primary">수정하기</button>
+    </a>
+
+    <form id="delete-form" th:action="@{'/board/' + ${detailBoard.id}}" method="post">
+        <input type="hidden" name="_method" value="delete"/>
+        <input class="btn btn-primary" type="submit" value="삭제하기">
+    </form>
+</div>
+</body>
+</html>
