@@ -29,8 +29,6 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     @Override
     public Long createBoard(BoardCreateRequestDto requestDto) {
-        log.info("log title = ", requestDto.getTitle());
-        log.info("log content = ", requestDto.getContent());
         return boardRepository.save(requestDto.toEntity()).getId();
     }
 
@@ -43,9 +41,13 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public BoardResponseDto detailBoard(Long id) {
-        return boardRepository.findById(id)
-                .map(BoardResponseDto::new)
+        Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+
+        boardRepository.updateCountView(id);
+        return BoardResponseDto.builder()
+                .board(board)
+                .build();
     }
 
     @Transactional

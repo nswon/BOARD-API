@@ -20,9 +20,11 @@ public class Board extends BaseTimeEntity {
 
     private String content;
 
+    @Column(columnDefinition = "integer default 0")
+    private int countView;
+
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
     }
-
 }

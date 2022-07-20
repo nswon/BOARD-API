@@ -11,9 +11,10 @@
 <div th:insert="common/header.html" id="header"></div>
 
 <!--단건조회부분-->
-<h1 th:text="${detailBoard.title}"></h1>
+제목 : <h1 th:text="${detailBoard.title}"></h1>
+조회수 : <p th:text="${detailBoard.countView}"></p>
 <p th:inline="text">작성일 : [[${#temporals.format(detailBoard.createdDate, 'yyyy-MM-dd HH:mm')}]]</p>
-<p th:text="${detailBoard.content}"></p>
+제목 : <p th:text="${detailBoard.content}"></p>
 
 <div class="btn-group" role="group" aria-label="Basic example">
     <a th:href="@{'/board/edit/' + ${detailBoard.id}}">

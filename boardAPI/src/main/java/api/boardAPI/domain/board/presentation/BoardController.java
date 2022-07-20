@@ -2,6 +2,7 @@ package api.boardAPI.domain.board.presentation;
 
 import api.boardAPI.domain.board.presentation.dto.request.BoardCreateRequestDto;
 import api.boardAPI.domain.board.presentation.dto.request.BoardUpdateRequestDto;
+import api.boardAPI.domain.board.presentation.dto.response.BoardResponseDto;
 import api.boardAPI.domain.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
