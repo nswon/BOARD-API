@@ -3,10 +3,9 @@ package api.boardAPI.domain.member.presentation;
 import api.boardAPI.domain.member.presentation.dto.request.MemberRequestDto;
 import api.boardAPI.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,5 +17,15 @@ public class MemberController {
     @PostMapping("/join")
     public Long join(@RequestBody MemberRequestDto requestDto) {
         return memberService.join(requestDto);
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestBody Map<String, String> member) {
+        return memberService.login(member);
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        return "WOW! DONE!!";
     }
 }
