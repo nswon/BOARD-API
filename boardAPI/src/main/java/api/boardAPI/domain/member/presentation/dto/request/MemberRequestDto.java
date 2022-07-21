@@ -1,11 +1,16 @@
 package api.boardAPI.domain.member.presentation.dto.request;
 
 import api.boardAPI.domain.member.domain.Member;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class MemberSignUpRequestDto {
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class MemberRequestDto {
 
     private String email;
     private String nickname;
@@ -21,11 +26,4 @@ public class MemberSignUpRequestDto {
                 .build();
     }
 
-    @Builder
-    public MemberSignUpRequestDto(String email, String nickname, int age, String password) {
-        this.email = email;
-        this.nickname = nickname;
-        this.age = age;
-        this.password = password;
-    }
 }
