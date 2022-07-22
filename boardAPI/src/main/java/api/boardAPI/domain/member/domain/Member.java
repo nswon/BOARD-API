@@ -45,7 +45,7 @@ public class Member implements UserDetails {
 
 //    회원가입시 USER 권한 부여
     public void addUserAuthority() {
-        this.role = Role.USER;
+        this.role = Role.ROLE_USER;
     }
 
 //    비밀번호 암호화

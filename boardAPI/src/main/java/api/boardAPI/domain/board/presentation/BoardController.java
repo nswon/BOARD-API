@@ -4,13 +4,16 @@ import api.boardAPI.domain.board.presentation.dto.request.BoardCreateRequestDto;
 import api.boardAPI.domain.board.presentation.dto.response.BoardResponseDto;
 import api.boardAPI.domain.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/board")
+@Slf4j
 public class BoardController {
 
     private final BoardService boardService;
