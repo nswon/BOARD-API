@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 public class BoardException extends BaseException {
 
     private BaseExceptionType baseExceptionType;
+
     @Override
     public BaseExceptionType getExceptionType() {
         return baseExceptionType;

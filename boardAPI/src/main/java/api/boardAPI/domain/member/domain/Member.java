@@ -25,7 +25,8 @@ import java.util.List;
 @Slf4j
 public class Member implements UserDetails {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
 
@@ -47,17 +48,14 @@ public class Member implements UserDetails {
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Board> boardList = new ArrayList<>();
 
-//    연관관계 편의 메서드
     public void addBoard(Board board) {
         boardList.add(board);
     }
 
-//    회원가입시 USER 권한 부여
     public void addUserAuthority() {
         this.role = Role.ROLE_USER;
     }
 
-//    비밀번호 암호화
     public void encodePassword(PasswordEncoder passwordEncoder) {
         this.password = passwordEncoder.encode(password);
     }
@@ -94,7 +92,6 @@ public class Member implements UserDetails {
         return true;
     }
 
-//    회원 정보 변경 메서드
     public void update(String nickname, int age) {
         this.nickname = nickname;
         this.age = age;
@@ -104,7 +101,7 @@ public class Member implements UserDetails {
         this.password = passwordEncoder.encode(password);
     }
 
-    public  boolean matchPassword(PasswordEncoder passwordEncoder, String checkPassword) {
+    public boolean matchPassword(PasswordEncoder passwordEncoder, String checkPassword) {
         return passwordEncoder.matches(checkPassword, getPassword());
     }
 

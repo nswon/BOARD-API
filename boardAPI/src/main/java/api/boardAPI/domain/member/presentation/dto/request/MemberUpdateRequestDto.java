@@ -20,6 +20,6 @@ public class MemberUpdateRequestDto {
     private String nickname;
 
     @NotNull(message = "나이를 입력해주세요.")
-    @Positive //양수만 허용
+    @Positive
     private int age;
 }

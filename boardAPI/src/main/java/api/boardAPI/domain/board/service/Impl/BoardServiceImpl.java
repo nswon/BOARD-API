@@ -5,9 +5,9 @@ import api.boardAPI.domain.board.domain.repository.BoardRepository;
 import api.boardAPI.domain.board.exception.BoardException;
 import api.boardAPI.domain.board.exception.BoardExceptionType;
 import api.boardAPI.domain.board.presentation.dto.request.BoardCreateRequestDto;
+import api.boardAPI.domain.board.presentation.dto.request.BoardUpdateRequestDto;
 import api.boardAPI.domain.board.presentation.dto.response.BoardResponseDto;
 import api.boardAPI.domain.board.service.BoardService;
-import api.boardAPI.domain.member.domain.Member;
 import api.boardAPI.domain.member.domain.repository.MemberRepository;
 import api.boardAPI.domain.member.exception.MemberException;
 import api.boardAPI.domain.member.exception.MemberExceptionType;
@@ -36,8 +36,8 @@ public class BoardServiceImpl implements BoardService {
         Board board = requestDto.toEntity();
         board.confirmWriter(memberRepository.findByEmail(SecurityUtil.getLoginUserEmail())
                 .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_FOUND_MEMBER)));
-
         boardRepository.save(board);
+
         return board.getId();
     }
 
@@ -50,17 +50,16 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public BoardResponseDto detail(Long id) {
-        return boardRepository.findById(id)
-                .map(BoardResponseDto::new)
-                .orElseThrow(() -> new BoardException(BoardExceptionType.NOT_FOUND_BOARD));
+        Board board = validateBoardExistence(id);
+        return BoardResponseDto.builder()
+                .board(board)
+                .build();
     }
 
     @Transactional
     @Override
-    public Long update(Long id, BoardCreateRequestDto requestDto) {
-        Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new BoardException(BoardExceptionType.NOT_FOUND_BOARD));
-
+    public Long update(Long id, BoardUpdateRequestDto requestDto) {
+        Board board = validateBoardExistence(id);
         board.update(requestDto.getTitle(), requestDto.getContent());
         return board.getId();
     }
@@ -68,9 +67,7 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     @Override
     public Long delete(Long id) {
-        Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new BoardException(BoardExceptionType.NOT_FOUND_BOARD));
-
+        Board board = validateBoardExistence(id);
         boardRepository.deleteById(id);
         return board.getId();
     }
@@ -87,5 +84,10 @@ public class BoardServiceImpl implements BoardService {
         Pageable pageable = PageRequest.of(pageNum, 10);
         return boardRepository.findAll(pageable)
                 .map(BoardResponseDto::new);
+    }
+
+    public Board validateBoardExistence(Long id) {
+        return boardRepository.findById(id)
+                .orElseThrow(() -> new BoardException(BoardExceptionType.NOT_FOUND_BOARD));
     }
 }

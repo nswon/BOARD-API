@@ -1,12 +1,14 @@
 package api.boardAPI.global.exception;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -16,11 +18,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ExceptionAdvice {
 
     @ExceptionHandler(BaseException.class)
-    public ResponseEntity handleBaseException(BaseException exception){
-        log.error("BaseException errorMessage(): {}",exception.getExceptionType().getErrorMessage());
-        log.error("BaseException errorCode(): {}",exception.getExceptionType().getErrorCode());
+    public ResponseEntity handleBaseException(BaseException exception) {
+        log.error("BaseException errorMessage(): {}", exception.getExceptionType().getErrorMessage());
+        log.error("BaseException errorCode(): {}", exception.getExceptionType().getErrorCode());
 
-        return new ResponseEntity(new ExceptionDto(exception.getExceptionType().getErrorCode(), exception.getExceptionType().getErrorMessage()),exception.getExceptionType().getHttpStatus());
+        return new ResponseEntity(new ExceptionDto(exception.getExceptionType().getErrorCode(), exception.getExceptionType().getErrorMessage()), exception.getExceptionType().getHttpStatus());
     }
 
     @ExceptionHandler(Exception.class)
@@ -28,6 +30,14 @@ public class ExceptionAdvice {
         exception.printStackTrace();
         return new ResponseEntity(HttpStatus.OK);
     }
+
+//    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+//    public ResponseEntity handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+//        ExceptionDto dto = ExceptionDto.builder()
+//                .errorCode(405)
+//                .errorMessage("잘못된 메서드 요청합니다.").build();
+//        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(dto);
+//    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public String processValidationError(MethodArgumentNotValidException e) {
@@ -41,7 +51,7 @@ public class ExceptionAdvice {
             builder.append(fieldError.getDefaultMessage());
             builder.append("\n 입력된 값: [");
             builder.append(fieldError.getRejectedValue());
-            builder.append("]");
+            builder.append("] \n");
         }
 
         return builder.toString();
@@ -49,6 +59,7 @@ public class ExceptionAdvice {
 
     @Data
     @AllArgsConstructor
+    @Builder
     static class ExceptionDto {
         private Integer errorCode;
         private String errorMessage;

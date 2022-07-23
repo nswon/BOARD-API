@@ -14,6 +14,7 @@ public enum BoardExceptionType implements BaseExceptionType {
     private int errorCode;
     private HttpStatus httpStatus;
     private String errorMessage;
+
     @Override
     public int getErrorCode() {
         return this.errorCode;

@@ -17,7 +17,8 @@ import javax.persistence.*;
 @Table(name = "BOARD")
 public class Board extends BaseTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id")
     private Long id;
 
@@ -31,13 +32,11 @@ public class Board extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member writer;
 
-
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
     }
 
-//    연관관계 편의 메서드
     public void confirmWriter(Member writer) {
         this.writer = writer;
         writer.addBoard(this);
