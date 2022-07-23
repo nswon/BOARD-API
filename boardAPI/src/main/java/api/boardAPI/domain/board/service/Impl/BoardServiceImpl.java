@@ -5,6 +5,11 @@ import api.boardAPI.domain.board.domain.repository.BoardRepository;
 import api.boardAPI.domain.board.presentation.dto.request.BoardCreateRequestDto;
 import api.boardAPI.domain.board.presentation.dto.response.BoardResponseDto;
 import api.boardAPI.domain.board.service.BoardService;
+import api.boardAPI.domain.member.domain.Member;
+import api.boardAPI.domain.member.domain.repository.MemberRepository;
+import api.boardAPI.domain.member.exception.MemberException;
+import api.boardAPI.domain.member.exception.MemberExceptionType;
+import api.boardAPI.global.security.jwt.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,11 +26,17 @@ import java.util.stream.Collectors;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     @Override
     public Long create(BoardCreateRequestDto requestDto) {
-        return boardRepository.save(requestDto.toEntity()).getId();
+        Board board = requestDto.toEntity();
+        board.confirmWriter(memberRepository.findByEmail(SecurityUtil.getLoginUserEmail())
+                .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_FOUND_MEMBER)));
+
+        boardRepository.save(board);
+        return board.getId();
     }
 
     @Override

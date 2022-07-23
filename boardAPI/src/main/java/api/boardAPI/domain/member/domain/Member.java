@@ -1,5 +1,6 @@
 package api.boardAPI.domain.member.domain;
 
+import api.boardAPI.domain.board.domain.Board;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,6 +43,14 @@ public class Member implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Board> boardList = new ArrayList<>();
+
+//    연관관계 편의 메서드
+    public void addBoard(Board board) {
+        boardList.add(board);
+    }
 
 //    회원가입시 USER 권한 부여
     public void addUserAuthority() {

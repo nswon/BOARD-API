@@ -1,6 +1,7 @@
 package api.boardAPI.domain.board.presentation.dto.request;
 
 import api.boardAPI.domain.board.domain.Board;
+import api.boardAPI.domain.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

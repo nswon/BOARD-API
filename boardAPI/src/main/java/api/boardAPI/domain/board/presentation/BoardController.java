@@ -18,8 +18,8 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    @PostMapping("/write")
-    public Long writeBoard(@RequestBody BoardCreateRequestDto requestDto) {
+    @PostMapping("/create")
+    public Long createBoard(@RequestBody BoardCreateRequestDto requestDto) {
         return boardService.create(requestDto);
     }
 
