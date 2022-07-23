@@ -6,6 +6,9 @@ import api.boardAPI.domain.board.presentation.dto.request.BoardCreateRequestDto;
 import api.boardAPI.domain.board.presentation.dto.response.BoardResponseDto;
 import api.boardAPI.domain.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,5 +60,19 @@ public class BoardServiceImpl implements BoardService {
 
         boardRepository.deleteById(id);
         return board.getId();
+    }
+
+    @Override
+    public List<BoardResponseDto> search(String keyword) {
+        return boardRepository.findByTitleContaining(keyword).stream()
+                .map(BoardResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<BoardResponseDto> paging(int pageNum) {
+        Pageable pageable = PageRequest.of(pageNum, 10);
+        return boardRepository.findAll(pageable)
+                .map(BoardResponseDto::new);
     }
 }
