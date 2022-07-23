@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
@@ -24,7 +25,7 @@ public class MemberController {
      * 회원가입
      */
     @PostMapping("/join")
-    public Long join(@RequestBody MemberSignUpRequestDto requestDto) {
+    public Long join(@RequestBody @Valid MemberSignUpRequestDto requestDto) {
         return memberService.join(requestDto);
     }
 
@@ -56,7 +57,7 @@ public class MemberController {
      * 내정보 수정
      */
     @PutMapping("/myInfo/edit")
-    public Long updateMember(@RequestBody MemberUpdateRequestDto requestDto) {
+    public Long updateMember(@RequestBody @Valid MemberUpdateRequestDto requestDto) {
         return memberService.updateMember(requestDto);
     }
 
@@ -64,7 +65,7 @@ public class MemberController {
      * 비밀번호 수정
      */
     @PutMapping("/myInfo/password")
-    public Long updatePassword(@RequestBody MemberUpdatePasswordRequestDto requestDto) {
+    public Long updatePassword(@RequestBody @Valid MemberUpdatePasswordRequestDto requestDto) {
         return memberService.updatePassword(requestDto.getBeforePassword(), requestDto.getAfterPassword());
     }
 
@@ -72,7 +73,7 @@ public class MemberController {
      * 회원탈퇴
      */
     @DeleteMapping("/delete")
-    public Long withdrawal(@RequestBody MemberDeleteRequestDto requestDto) {
+    public Long withdrawal(@RequestBody @Valid MemberDeleteRequestDto requestDto) {
         return memberService.Withdrawal(requestDto.getPassword());
     }
 }

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -19,17 +20,9 @@ public class BoardController {
     private final BoardService boardService;
 
     @PostMapping("/create")
-    public Long createBoard(@RequestBody BoardCreateRequestDto requestDto) {
+    public Long createBoard(@RequestBody @Valid BoardCreateRequestDto requestDto) {
         return boardService.create(requestDto);
     }
-
-    /*
-    페이지네이션 변경전
-    @GetMapping("/findAll")
-    public List<BoardResponseDto> allBoard() {
-        return boardService.all();
-    }
-     */
 
 //    변경 후
     @GetMapping("/findAll")
@@ -43,7 +36,8 @@ public class BoardController {
     }
 
     @PutMapping("/find/edit/{id}")
-    public Long updateBoard(@PathVariable("id") Long id, @RequestBody BoardCreateRequestDto requestDto) {
+    public Long updateBoard(@PathVariable("id") Long id,
+                            @RequestBody @Valid BoardCreateRequestDto requestDto) {
         return boardService.update(id, requestDto);
     }
 
