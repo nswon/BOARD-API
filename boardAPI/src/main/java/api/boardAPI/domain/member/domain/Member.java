@@ -1,6 +1,7 @@
 package api.boardAPI.domain.member.domain;
 
 import api.boardAPI.domain.board.domain.Board;
+import api.boardAPI.domain.comment.domain.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -48,8 +49,15 @@ public class Member implements UserDetails {
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Board> boardList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> commentList = new ArrayList<>();
+
     public void addBoard(Board board) {
         boardList.add(board);
+    }
+
+    public void addComment(Comment comment) {
+        commentList.add(comment);
     }
 
     public void addUserAuthority() {
