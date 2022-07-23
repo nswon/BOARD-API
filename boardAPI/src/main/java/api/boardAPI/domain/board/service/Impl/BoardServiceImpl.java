@@ -2,6 +2,8 @@ package api.boardAPI.domain.board.service.Impl;
 
 import api.boardAPI.domain.board.domain.Board;
 import api.boardAPI.domain.board.domain.repository.BoardRepository;
+import api.boardAPI.domain.board.exception.BoardException;
+import api.boardAPI.domain.board.exception.BoardExceptionType;
 import api.boardAPI.domain.board.presentation.dto.request.BoardCreateRequestDto;
 import api.boardAPI.domain.board.presentation.dto.response.BoardResponseDto;
 import api.boardAPI.domain.board.service.BoardService;
@@ -50,14 +52,14 @@ public class BoardServiceImpl implements BoardService {
     public BoardResponseDto detail(Long id) {
         return boardRepository.findById(id)
                 .map(BoardResponseDto::new)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new BoardException(BoardExceptionType.NOT_FOUND_BOARD));
     }
 
     @Transactional
     @Override
     public Long update(Long id, BoardCreateRequestDto requestDto) {
         Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new BoardException(BoardExceptionType.NOT_FOUND_BOARD));
 
         board.update(requestDto.getTitle(), requestDto.getContent());
         return board.getId();
@@ -67,7 +69,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Long delete(Long id) {
         Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new BoardException(BoardExceptionType.NOT_FOUND_BOARD));
 
         boardRepository.deleteById(id);
         return board.getId();
