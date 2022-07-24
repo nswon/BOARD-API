@@ -27,7 +27,7 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody Map<String, String> member) {
+    public String login(@RequestBody @Valid Map<String, String> member) {
         return memberService.login(member);
     }
 
@@ -54,5 +54,10 @@ public class MemberController {
     @DeleteMapping("/delete")
     public Long withdrawal(@RequestBody @Valid MemberDeleteRequestDto requestDto) {
         return memberService.Withdrawal(requestDto.getPassword());
+    }
+
+    @GetMapping("/admin")
+    public String admin() {
+        return "hi admin";
     }
 }

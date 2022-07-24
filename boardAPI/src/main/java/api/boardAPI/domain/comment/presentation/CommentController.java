@@ -6,6 +6,8 @@ import api.boardAPI.domain.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/comment")
@@ -15,13 +17,13 @@ public class CommentController {
 
     @PostMapping("/{postId}")
     public Long createComment(@PathVariable("postId") Long postId,
-                              @RequestBody CommentCreateRequestDto requestDto) {
+                              @RequestBody @Valid CommentCreateRequestDto requestDto) {
         return commentService.create(postId, requestDto);
     }
 
     @PutMapping("/{commentId}")
     public Long updateComment(@PathVariable("commentId") Long commentId,
-                              @RequestBody CommentUpdateRequestDto requestDto) {
+                              @RequestBody @Valid CommentUpdateRequestDto requestDto) {
         return commentService.update(commentId, requestDto);
     }
 

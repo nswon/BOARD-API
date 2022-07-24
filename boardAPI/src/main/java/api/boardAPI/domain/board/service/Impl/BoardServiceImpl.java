@@ -60,6 +60,10 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Long update(Long id, BoardUpdateRequestDto requestDto) {
         Board board = validateBoardExistence(id);
+        if(!board.getWriter().getUsername().equals(SecurityUtil.getLoginUserEmail())) {
+            throw new BoardException(BoardExceptionType.DIFFERENT_MEMBER_NOT_UPDATE);
+        }
+
         board.update(requestDto.getTitle(), requestDto.getContent());
         return board.getId();
     }
@@ -68,6 +72,10 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Long delete(Long id) {
         Board board = validateBoardExistence(id);
+        if(!board.getWriter().getUsername().equals(SecurityUtil.getLoginUserEmail())) {
+            throw new BoardException(BoardExceptionType.DIFFERENT_MEMBER_NOT_DELETE);
+        }
+
         boardRepository.deleteById(id);
         return board.getId();
     }

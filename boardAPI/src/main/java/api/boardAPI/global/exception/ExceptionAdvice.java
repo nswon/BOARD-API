@@ -6,12 +6,14 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 
 @RestControllerAdvice
 @Slf4j
@@ -31,13 +33,29 @@ public class ExceptionAdvice {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-//    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-//    public ResponseEntity handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
-//        ExceptionDto dto = ExceptionDto.builder()
-//                .errorCode(405)
-//                .errorMessage("잘못된 메서드 요청합니다.").build();
-//        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(dto);
-//    }
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        ExceptionDto dto = ExceptionDto.builder()
+                .errorCode(405)
+                .errorMessage("잘못된 메서드 요청입니다.").build();
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(dto);
+    }
+
+    @ExceptionHandler(HttpClientErrorException.Unauthorized.class)
+    public ResponseEntity handleUnauthorized(HttpClientErrorException.Unauthorized e) {
+        ExceptionDto dto = ExceptionDto.builder()
+                .errorCode(401)
+                .errorMessage("토큰이 유효하지 않습니다.").build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(dto);
+    }
+
+    @ExceptionHandler(HttpClientErrorException.Forbidden.class)
+    public ResponseEntity handleForbidden(HttpClientErrorException.Forbidden e) {
+        ExceptionDto dto = ExceptionDto.builder()
+                .errorCode(403)
+                .errorMessage("권한이 없습니다.").build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(dto);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public String processValidationError(MethodArgumentNotValidException e) {

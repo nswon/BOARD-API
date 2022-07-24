@@ -11,7 +11,7 @@ public enum CommentExceptionType implements BaseExceptionType {
 
     NOT_FOUND_COMMENT(606, HttpStatus.OK, "존재하지 않는 댓글입니다."),
     DIFFERENT_MEMBER_NOT_UPDATE(607, HttpStatus.OK, "다른 회원 댓글은 수정할 수 없습니다."),
-    DIFFERENT_MEMBER_NOT_DELETE(607, HttpStatus.OK, "다른 회원 댓글은 삭제할 수 없습니다.");
+    DIFFERENT_MEMBER_NOT_DELETE(608, HttpStatus.OK, "다른 회원 댓글은 삭제할 수 없습니다.");
 
     private int errorCode;
     private HttpStatus httpStatus;

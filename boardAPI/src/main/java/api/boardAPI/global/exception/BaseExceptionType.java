@@ -3,9 +3,9 @@ package api.boardAPI.global.exception;
 import org.springframework.http.HttpStatus;
 
 public interface BaseExceptionType {
-    int getErrorCode(); //에러코드
+    int getErrorCode();
 
-    HttpStatus getHttpStatus(); //HTTP 상태
+    HttpStatus getHttpStatus();
 
-    String getErrorMessage(); //에러메세지
+    String getErrorMessage();
 }
