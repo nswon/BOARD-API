@@ -86,7 +86,7 @@ public class BoardServiceImpl implements BoardService {
                 .map(BoardResponseDto::new);
     }
 
-    public Board validateBoardExistence(Long id) {
+    private Board validateBoardExistence(Long id) {
         return boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(BoardExceptionType.NOT_FOUND_BOARD));
     }

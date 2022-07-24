@@ -65,17 +65,16 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberResponseDto findMyInfo() {
-        return memberRepository.findByEmail(SecurityUtil.getLoginUserEmail())
-                .map(MemberResponseDto::new)
-                .orElseThrow(() -> new MemberException(MemberExceptionType.REQUIRED_DO_LOGIN));
+        Member member = validateLoginStatus();
+        return MemberResponseDto.builder()
+                .member(member)
+                .build();
     }
 
     @Transactional
     @Override
     public Long updateMember(MemberUpdateRequestDto requestDto) {
-        Member member = memberRepository.findByEmail(SecurityUtil.getLoginUserEmail())
-                .orElseThrow(() -> new MemberException(MemberExceptionType.REQUIRED_DO_LOGIN));
-
+        Member member = validateLoginStatus();
         member.update(requestDto.getNickname(), requestDto.getAge());
         return member.getId();
     }
@@ -83,9 +82,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     @Override
     public Long updatePassword(String beforePassword, String afterPassword) {
-        Member member = memberRepository.findByEmail(SecurityUtil.getLoginUserEmail())
-                .orElseThrow(() -> new MemberException(MemberExceptionType.REQUIRED_DO_LOGIN));
-
+        Member member = validateLoginStatus();
         if (!member.matchPassword(passwordEncoder, beforePassword)) {
             throw new MemberException(MemberExceptionType.WRONG_PASSWORD);
         }
@@ -97,9 +94,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     @Override
     public Long Withdrawal(String checkPassword) {
-        Member member = memberRepository.findByEmail(SecurityUtil.getLoginUserEmail())
-                .orElseThrow(() -> new MemberException(MemberExceptionType.REQUIRED_DO_LOGIN));
-
+        Member member = validateLoginStatus();
         if (!member.matchPassword(passwordEncoder, checkPassword)) {
             throw new MemberException(MemberExceptionType.WRONG_PASSWORD);
         }
@@ -108,4 +103,8 @@ public class MemberServiceImpl implements MemberService {
         return member.getId();
     }
 
+    private Member validateLoginStatus() {
+        return memberRepository.findByEmail(SecurityUtil.getLoginUserEmail())
+                .orElseThrow(() -> new MemberException(MemberExceptionType.REQUIRED_DO_LOGIN));
+    }
 }

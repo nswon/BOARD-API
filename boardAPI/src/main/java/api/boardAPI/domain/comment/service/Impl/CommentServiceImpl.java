@@ -5,6 +5,8 @@ import api.boardAPI.domain.board.exception.BoardException;
 import api.boardAPI.domain.board.exception.BoardExceptionType;
 import api.boardAPI.domain.comment.domain.Comment;
 import api.boardAPI.domain.comment.domain.repository.CommentRepository;
+import api.boardAPI.domain.comment.exception.CommentException;
+import api.boardAPI.domain.comment.exception.CommentExceptionType;
 import api.boardAPI.domain.comment.presentation.dto.request.CommentCreateRequestDto;
 import api.boardAPI.domain.comment.presentation.dto.request.CommentUpdateRequestDto;
 import api.boardAPI.domain.comment.service.CommentService;
@@ -15,7 +17,6 @@ import api.boardAPI.global.security.jwt.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 @Service
 @RequiredArgsConstructor
@@ -44,11 +45,12 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Long update(Long id, CommentUpdateRequestDto requestDto) {
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+                .orElseThrow(() -> new CommentException(CommentExceptionType.NOT_FOUND_COMMENT));
 
         if (!comment.getWriter().getUsername().equals(SecurityUtil.getLoginUserEmail())) {
-            throw new IllegalArgumentException("다른 회원 댓글은 수정할 수 없습니다.");
+            throw new CommentException(CommentExceptionType.DIFFERENT_MEMBER_NOT_UPDATE);
         }
+
         comment.updateContent(requestDto.getContent());
         return comment.getId();
     }
@@ -57,11 +59,12 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Long delete(Long id) {
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+                .orElseThrow(() -> new CommentException(CommentExceptionType.NOT_FOUND_COMMENT));
 
         if (!comment.getWriter().getUsername().equals(SecurityUtil.getLoginUserEmail())) {
-            throw new IllegalArgumentException("다른 회원 댓글은 삭제할 수 없습니다.");
+            throw new CommentException(CommentExceptionType.DIFFERENT_MEMBER_NOT_DELETE);
         }
+
         commentRepository.delete(comment);
         return comment.getId();
     }
