@@ -4,9 +4,7 @@ import api.boardAPI.domain.member.domain.Member;
 import api.boardAPI.domain.member.domain.repository.MemberRepository;
 import api.boardAPI.domain.member.exception.MemberException;
 import api.boardAPI.domain.member.exception.MemberExceptionType;
-import api.boardAPI.domain.member.presentation.dto.request.MemberSignInRequestDto;
-import api.boardAPI.domain.member.presentation.dto.request.MemberSignUpRequestDto;
-import api.boardAPI.domain.member.presentation.dto.request.MemberUpdateRequestDto;
+import api.boardAPI.domain.member.presentation.dto.request.*;
 import api.boardAPI.domain.member.presentation.dto.response.MemberResponseDto;
 import api.boardAPI.domain.member.service.MemberService;
 import api.boardAPI.global.security.jwt.JwtTokenProvider;
@@ -16,8 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -93,13 +91,49 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     @Override
-    public Long Withdrawal(String checkPassword) {
+    public Long withdrawal(String checkPassword) {
         Member member = validateLoginStatus();
         if (!member.matchPassword(passwordEncoder, checkPassword)) {
             throw new MemberException(MemberExceptionType.WRONG_PASSWORD);
         }
 
         memberRepository.delete(member);
+        return member.getId();
+    }
+
+    @Transactional
+    @Override
+    public Long addAdminAuthority(MemberAdminRequestDto requestDto) {
+        Member member = memberRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_SIGNUP_EMAIL));
+
+        if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
+            throw new MemberException(MemberExceptionType.WRONG_PASSWORD);
+        }
+
+        member.addAdminAuthority();
+        return member.getId();
+    }
+
+    @Override
+    public List<MemberResponseDto> allMemberList() {
+        return memberRepository.findAll().stream()
+                .map(MemberResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    @Override
+    public Long withdrawalMember(Long memberId, String password) {
+        Member member = validateLoginStatus();
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_FOUND_MEMBER));
+
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new MemberException(MemberExceptionType.WRONG_PASSWORD);
+        }
+
+        memberRepository.delete(findMember);
         return member.getId();
     }
 

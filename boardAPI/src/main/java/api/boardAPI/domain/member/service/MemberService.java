@@ -1,11 +1,8 @@
 package api.boardAPI.domain.member.service;
 
-import api.boardAPI.domain.member.presentation.dto.request.MemberSignInRequestDto;
-import api.boardAPI.domain.member.presentation.dto.request.MemberSignUpRequestDto;
-import api.boardAPI.domain.member.presentation.dto.request.MemberUpdateRequestDto;
+import api.boardAPI.domain.member.presentation.dto.request.*;
 import api.boardAPI.domain.member.presentation.dto.response.MemberResponseDto;
-
-import java.util.Map;
+import java.util.List;
 
 public interface MemberService {
     Long join(MemberSignUpRequestDto requestDto);
@@ -20,5 +17,10 @@ public interface MemberService {
 
     Long updatePassword(String beforePassword, String afterPassword);
 
-    Long Withdrawal(String checkPassword);
+    Long withdrawal(String checkPassword);
+
+    Long addAdminAuthority(MemberAdminRequestDto requestDto);
+
+    List<MemberResponseDto> allMemberList();
+    Long withdrawalMember(Long memberId, String password);
 }

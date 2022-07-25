@@ -4,10 +4,10 @@ import api.boardAPI.domain.comment.presentation.dto.request.CommentCreateRequest
 import api.boardAPI.domain.comment.presentation.dto.request.CommentUpdateRequestDto;
 import api.boardAPI.domain.comment.presentation.dto.response.CommentResponseDto;
 import api.boardAPI.domain.comment.service.CommentService;
+import api.boardAPI.global.wrap.Wrap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,8 +30,8 @@ public class CommentController {
     }
 
     @GetMapping("/findAll")
-    public List<CommentResponseDto> allComment() {
-        return commentService.all();
+    public Wrap allComment() {
+        return new Wrap(commentService.all());
     }
 
     @GetMapping("/find/{commentId}")

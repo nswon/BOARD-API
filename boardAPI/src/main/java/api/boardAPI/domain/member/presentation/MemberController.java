@@ -3,12 +3,11 @@ package api.boardAPI.domain.member.presentation;
 import api.boardAPI.domain.member.presentation.dto.request.*;
 import api.boardAPI.domain.member.presentation.dto.response.MemberResponseDto;
 import api.boardAPI.domain.member.service.MemberService;
+import api.boardAPI.global.wrap.Wrap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,11 +49,22 @@ public class MemberController {
 
     @DeleteMapping("/delete")
     public Long withdrawal(@RequestBody @Valid MemberDeleteRequestDto requestDto) {
-        return memberService.Withdrawal(requestDto.getPassword());
+        return memberService.withdrawal(requestDto.getPassword());
     }
 
-    @GetMapping("/admin")
-    public String admin() {
-        return "hi admin";
+    @PostMapping("/admin")
+    public Long addAdminAuthority(@RequestBody @Valid MemberAdminRequestDto requestDto) {
+        return memberService.addAdminAuthority(requestDto);
+    }
+
+    @GetMapping("/admin/findAll")
+    public Wrap findAllMemberList() {
+        return new Wrap(memberService.allMemberList());
+    }
+
+    @DeleteMapping("/admin/delete/{memberId}")
+    public Long withdrawalMember(@PathVariable("memberId") Long memberId,
+                                 @RequestBody @Valid MemberDeleteRequestDto requestDto) {
+        return memberService.withdrawalMember(memberId, requestDto.getPassword());
     }
 }

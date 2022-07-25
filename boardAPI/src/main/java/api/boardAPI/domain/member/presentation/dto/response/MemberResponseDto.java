@@ -4,6 +4,8 @@ import api.boardAPI.domain.member.domain.Member;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class MemberResponseDto {
 
@@ -11,6 +13,8 @@ public class MemberResponseDto {
     private String email;
     private String nickname;
     private int age;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
 
     @Builder
     public MemberResponseDto(Member member) {
@@ -18,5 +22,7 @@ public class MemberResponseDto {
         this.email = member.getEmail();
         this.nickname = member.getNickname();
         this.age = member.getAge();
+        this.createdDate = member.getCreatedDate();
+        this.modifiedDate = member.getModifiedDate();
     }
 }

@@ -4,8 +4,7 @@ import api.boardAPI.domain.board.presentation.dto.request.BoardCreateRequestDto;
 import api.boardAPI.domain.board.presentation.dto.request.BoardUpdateRequestDto;
 import api.boardAPI.domain.board.presentation.dto.response.BoardResponseDto;
 import api.boardAPI.domain.board.service.BoardService;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import api.boardAPI.global.wrap.Wrap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -50,11 +49,5 @@ public class BoardController {
     @GetMapping("/search")
     public Wrap searchBoard(@RequestParam("keyword") String keyword) {
         return new Wrap(boardService.search(keyword));
-    }
-
-    @Getter
-    @AllArgsConstructor
-    static public class Wrap<T> {
-        private T data;
     }
 }

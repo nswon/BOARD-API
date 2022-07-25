@@ -2,6 +2,7 @@ package api.boardAPI.domain.member.domain;
 
 import api.boardAPI.domain.board.domain.Board;
 import api.boardAPI.domain.comment.domain.Comment;
+import api.boardAPI.global.entity.BaseTimeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +25,7 @@ import java.util.List;
 @Builder
 @Table(name = "MEMBER")
 @Slf4j
-public class Member implements UserDetails {
+public class Member extends BaseTimeEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,6 +65,10 @@ public class Member implements UserDetails {
 
     public void addUserAuthority() {
         this.role = Role.ROLE_USER;
+    }
+
+    public void addAdminAuthority() {
+        this.role = Role.ROLE_ADMIN;
     }
 
     public void encodePassword(PasswordEncoder passwordEncoder) {
