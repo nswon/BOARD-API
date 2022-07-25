@@ -45,10 +45,7 @@ public class MemberServiceImpl implements MemberService {
     public String login(MemberSignInRequestDto requestDto) {
         Member member = memberRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_SIGNUP_EMAIL));
-
-        if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
-            throw new MemberException(MemberExceptionType.WRONG_PASSWORD);
-        }
+        validateMatchedPassword(requestDto.getPassword(), member.getPassword());
 
         String role = member.getRole().name();
         return jwtTokenProvider.createToken(member.getUsername(), role);
@@ -106,10 +103,7 @@ public class MemberServiceImpl implements MemberService {
     public Long addAdminAuthority(MemberAdminRequestDto requestDto) {
         Member member = memberRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_SIGNUP_EMAIL));
-
-        if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
-            throw new MemberException(MemberExceptionType.WRONG_PASSWORD);
-        }
+        validateMatchedPassword(requestDto.getPassword(), member.getPassword());
 
         member.addAdminAuthority();
         return member.getId();
@@ -128,10 +122,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = validateLoginStatus();
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_FOUND_MEMBER));
-
-        if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new MemberException(MemberExceptionType.WRONG_PASSWORD);
-        }
+        validateMatchedPassword(password, member.getPassword());
 
         memberRepository.delete(findMember);
         return member.getId();
@@ -140,5 +131,11 @@ public class MemberServiceImpl implements MemberService {
     private Member validateLoginStatus() {
         return memberRepository.findByEmail(SecurityUtil.getLoginUserEmail())
                 .orElseThrow(() -> new MemberException(MemberExceptionType.REQUIRED_DO_LOGIN));
+    }
+
+    private void validateMatchedPassword(String validPassword, String memberPassword) {
+        if (!passwordEncoder.matches(validPassword, memberPassword)) {
+            throw new MemberException(MemberExceptionType.WRONG_PASSWORD);
+        }
     }
 }
