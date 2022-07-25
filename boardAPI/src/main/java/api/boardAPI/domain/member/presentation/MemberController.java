@@ -1,9 +1,6 @@
 package api.boardAPI.domain.member.presentation;
 
-import api.boardAPI.domain.member.presentation.dto.request.MemberDeleteRequestDto;
-import api.boardAPI.domain.member.presentation.dto.request.MemberSignUpRequestDto;
-import api.boardAPI.domain.member.presentation.dto.request.MemberUpdatePasswordRequestDto;
-import api.boardAPI.domain.member.presentation.dto.request.MemberUpdateRequestDto;
+import api.boardAPI.domain.member.presentation.dto.request.*;
 import api.boardAPI.domain.member.presentation.dto.response.MemberResponseDto;
 import api.boardAPI.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +24,8 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody @Valid Map<String, String> member) {
-        return memberService.login(member);
+    public String login(@RequestBody @Valid MemberSignInRequestDto requestDto) {
+        return memberService.login(requestDto);
     }
 
     @GetMapping("/find/{id}")

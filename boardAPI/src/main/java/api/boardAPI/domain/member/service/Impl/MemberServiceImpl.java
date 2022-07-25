@@ -4,6 +4,7 @@ import api.boardAPI.domain.member.domain.Member;
 import api.boardAPI.domain.member.domain.repository.MemberRepository;
 import api.boardAPI.domain.member.exception.MemberException;
 import api.boardAPI.domain.member.exception.MemberExceptionType;
+import api.boardAPI.domain.member.presentation.dto.request.MemberSignInRequestDto;
 import api.boardAPI.domain.member.presentation.dto.request.MemberSignUpRequestDto;
 import api.boardAPI.domain.member.presentation.dto.request.MemberUpdateRequestDto;
 import api.boardAPI.domain.member.presentation.dto.response.MemberResponseDto;
@@ -43,17 +44,16 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     @Override
-    public String login(Map<String, String> members) {
-        Member member = memberRepository.findByEmail(members.get("email"))
+    public String login(MemberSignInRequestDto requestDto) {
+        Member member = memberRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_SIGNUP_EMAIL));
 
-        if (!passwordEncoder.matches(members.get("password"), member.getPassword())) {
+        if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
             throw new MemberException(MemberExceptionType.WRONG_PASSWORD);
         }
 
         String role = member.getRole().name();
-        String token = jwtTokenProvider.createToken(member.getUsername(), role);
-        return token;
+        return jwtTokenProvider.createToken(member.getUsername(), role);
     }
 
     @Override
