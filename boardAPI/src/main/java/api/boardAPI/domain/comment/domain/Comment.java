@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -34,6 +36,13 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "board_id")
     private Board board;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> childList = new ArrayList<>();
+
     public void confirmWriter(Member writer) {
         this.writer = writer;
         writer.addComment(this);
@@ -42,6 +51,15 @@ public class Comment extends BaseTimeEntity {
     public void confirmBoard(Board board) {
         this.board = board;
         board.addComment(this);
+    }
+
+    public void confirmParent(Comment parent) {
+        this.parent = parent;
+        parent.addChild(this);
+    }
+
+    public void addChild(Comment child) {
+        childList.add(child);
     }
 
     public void updateContent(String content) {
