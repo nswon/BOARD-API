@@ -18,7 +18,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        log.info("로그인요청할 때 입력한 아이디 값 : " + email);
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("로그인 아이디가 존재하지 않습니다."));
     }

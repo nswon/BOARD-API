@@ -1,6 +1,7 @@
 package api.boardAPI.domain.board.service.Impl;
 
 import api.boardAPI.domain.board.domain.Board;
+import api.boardAPI.domain.board.domain.repository.BoardQuerydslRepository;
 import api.boardAPI.domain.board.domain.repository.BoardRepository;
 import api.boardAPI.domain.board.exception.BoardException;
 import api.boardAPI.domain.board.exception.BoardExceptionType;
@@ -29,6 +30,7 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final BoardQuerydslRepository boardQuerydslRepository;
 
     @Transactional
     @Override
@@ -92,6 +94,13 @@ public class BoardServiceImpl implements BoardService {
         Pageable pageable = PageRequest.of(pageNum, 10);
         return boardRepository.findAll(pageable)
                 .map(BoardResponseDto::new);
+    }
+
+    @Override
+    public List<BoardResponseDto> findByTitle(String title) {
+        return boardQuerydslRepository.findByTitle_Querydsl(title).stream()
+                .map(BoardResponseDto::new)
+                .collect(Collectors.toList());
     }
 
     private Board validateBoardExistence(Long id) {

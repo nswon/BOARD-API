@@ -21,4 +21,6 @@ public interface BoardService {
     List<BoardResponseDto> search(String keyword);
 
     Page<BoardResponseDto> paging(int pageNum);
+
+    List<BoardResponseDto> findByTitle(String title);
 }

@@ -46,8 +46,13 @@ public class BoardController {
         return boardService.delete(id);
     }
 
-    @GetMapping("/search")
+    @GetMapping("/search/v1")
     public Wrap searchBoard(@RequestParam("keyword") String keyword) {
         return new Wrap(boardService.search(keyword));
+    }
+
+    @GetMapping("/search/v2")
+    public Wrap findByTitle_Querydsl(@RequestParam("title") String title) {
+        return new Wrap(boardService.findByTitle(title));
     }
 }
