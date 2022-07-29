@@ -20,10 +20,10 @@ public class BoardQuerydslRepository {
         this.query = new JPAQueryFactory(em);
     }
 
-    public List<Board> findByTitle_Querydsl(String title) {
+    public List<Board> findByTitle_Querydsl(String keyword) {
         return query
                 .selectFrom(board)
-                .where(board.title.eq(title))
+                .where(board.title.contains(keyword).or(board.writer.nickname.eq(keyword)))
                 .fetch();
     }
 }

@@ -52,7 +52,7 @@ public class BoardController {
     }
 
     @GetMapping("/search/v2")
-    public Wrap findByTitle_Querydsl(@RequestParam("title") String title) {
-        return new Wrap(boardService.findByTitle(title));
+    public Wrap findByTitle_Querydsl(@RequestParam("keyword") String keyword) {
+        return new Wrap(boardService.findByTitleOrNickname(keyword));
     }
 }

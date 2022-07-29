@@ -97,8 +97,8 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public List<BoardResponseDto> findByTitle(String title) {
-        return boardQuerydslRepository.findByTitle_Querydsl(title).stream()
+    public List<BoardResponseDto> findByTitleOrNickname(String keyword) {
+        return boardQuerydslRepository.findByTitle_Querydsl(keyword).stream()
                 .map(BoardResponseDto::new)
                 .collect(Collectors.toList());
     }
