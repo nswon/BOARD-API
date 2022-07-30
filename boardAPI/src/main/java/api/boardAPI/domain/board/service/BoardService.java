@@ -22,5 +22,5 @@ public interface BoardService {
 
     Page<BoardResponseDto> paging(int pageNum);
 
-    List<BoardResponseDto> findByTitleOrNickname(String keyword);
+    List<BoardResponseDto> findByBoard(String keyword);
 }

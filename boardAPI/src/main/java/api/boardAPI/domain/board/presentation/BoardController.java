@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 
 @RestController
@@ -47,12 +46,12 @@ public class BoardController {
     }
 
     @GetMapping("/search/v1")
-    public Wrap searchBoard(@RequestParam("keyword") String keyword) {
+    public Wrap searchBoardV1(@RequestParam("keyword") String keyword) {
         return new Wrap(boardService.search(keyword));
     }
 
     @GetMapping("/search/v2")
-    public Wrap findByTitle_Querydsl(@RequestParam("keyword") String keyword) {
-        return new Wrap(boardService.findByTitleOrNickname(keyword));
+    public Wrap searchBoardV2(@RequestParam("keyword") String keyword) {
+        return new Wrap(boardService.findByBoard(keyword));
     }
 }
