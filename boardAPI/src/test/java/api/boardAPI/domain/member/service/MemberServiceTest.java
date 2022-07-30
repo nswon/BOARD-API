@@ -5,6 +5,7 @@ import api.boardAPI.domain.member.domain.repository.MemberRepository;
 import api.boardAPI.domain.member.exception.MemberException;
 import api.boardAPI.domain.member.exception.MemberExceptionType;
 import api.boardAPI.domain.member.presentation.dto.request.MemberSignUpRequestDto;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -53,10 +54,10 @@ class MemberServiceTest {
     }
 
     @Test
-    public void 회원가입_실패_이메일중복() throws Exception {
+    public void 회원가입_실패_이메일중복() {
         //given
-        MemberSignUpRequestDto requestDto = MemberSignUpRequestDto.builder().email("nam@gmail.com").nickname("nam").age(18).password("nam1234@").build();
-        MemberSignUpRequestDto requestDto2 = MemberSignUpRequestDto.builder().email("nam@gmail.com").nickname("nam").age(18).password("nam1234@").build();
+        MemberSignUpRequestDto requestDto = MemberSignUpRequestDto.builder().email("test@gmail.com").nickname("test").age(18).password("test1234@").build();
+        MemberSignUpRequestDto requestDto2 = MemberSignUpRequestDto.builder().email("test@gmail.com").nickname("test").age(18).password("test1234@").build();
 
         //when
         memberService.join(requestDto);
@@ -71,4 +72,23 @@ class MemberServiceTest {
         //then
         fail("예외가 발생해야 한다.");
     }
+
+    @Test
+    public void 회원가입_실패_입력하지않은필드() throws Exception {
+        //given
+        MemberSignUpRequestDto requestDto = MemberSignUpRequestDto.builder().email(null).nickname("test").age(18).password("test1234@").build();
+        MemberSignUpRequestDto requestDto2 = MemberSignUpRequestDto.builder().email("test2@gmail.com").nickname(null).age(18).password("test1234@").build();
+        MemberSignUpRequestDto requestDto3 = MemberSignUpRequestDto.builder().email("test3@gmail.com").nickname("test3").age(0).password("test1234@").build();
+        MemberSignUpRequestDto requestDto4 = MemberSignUpRequestDto.builder().email("test4@gmail.com").nickname("test4").age(18).password(null).build();
+
+        //when
+
+        //then
+        Assertions.assertThrows(Exception.class, ()-> memberService.join(requestDto));
+        Assertions.assertThrows(Exception.class, ()-> memberService.join(requestDto2));
+        Assertions.assertThrows(Exception.class, ()-> memberService.join(requestDto3));
+        Assertions.assertThrows(Exception.class, ()-> memberService.join(requestDto4));
+    }
+
+
 }
