@@ -1,19 +1,23 @@
 package api.boardAPI.domain.member.service;
 
 import api.boardAPI.domain.member.domain.Member;
+import api.boardAPI.domain.member.domain.Role;
 import api.boardAPI.domain.member.domain.repository.MemberRepository;
 import api.boardAPI.domain.member.exception.MemberException;
 import api.boardAPI.domain.member.exception.MemberExceptionType;
 import api.boardAPI.domain.member.presentation.dto.request.MemberSignUpRequestDto;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest //스프링 컨테이너안에서 테스트를 돌리기 위함
+@SpringBootTest //스프링부트에서 테스트를 하려면 꼭 붙여야 함
 @Transactional //테스트를 실행하고 끝이나면 롤백함
 class MemberServiceTest {
 
@@ -30,15 +34,43 @@ class MemberServiceTest {
         em.clear();
     }
 
-    @Test
-    public void 회원가입_성공() {
-        //given
-        MemberSignUpRequestDto requestDto = MemberSignUpRequestDto.builder()
+    private MemberSignUpRequestDto makeMemberSignUpDto() {
+        return MemberSignUpRequestDto.builder()
                 .email("nam@gmail.com")
                 .nickname("nam")
                 .age(18)
                 .password("nam1234@")
                 .build();
+    }
+
+    private MemberSignUpRequestDto setMember() {
+//        회원가입 요청
+        MemberSignUpRequestDto requestDto = MemberSignUpRequestDto.builder().email("nam@gmail.com").nickname("nam").age(18).password("nam1234@").build();
+
+//        회원가입
+        memberService.join(requestDto);
+        clear();
+
+//        빈 컨텍스트 생성
+        SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();
+
+//        빈 컨텍스트에다가 회원가입한 아이디(이메일)과 비번, 권한이름을 넣어줌
+        emptyContext.setAuthentication(new UsernamePasswordAuthenticationToken(Member.builder()
+                .email(requestDto.getEmail())
+                .password(requestDto.getPassword())
+                .role(Role.ROLE_USER)
+                .build(),
+                null, null));
+
+//        컨텍스트에다 저장
+        SecurityContextHolder.setContext(emptyContext);
+        return requestDto;
+    }
+
+    @Test
+    public void 회원가입_성공() {
+        //given
+        MemberSignUpRequestDto requestDto = makeMemberSignUpDto();
 
         //when
         memberService.join(requestDto);
@@ -56,8 +88,8 @@ class MemberServiceTest {
     @Test
     public void 회원가입_실패_이메일중복() {
         //given
-        MemberSignUpRequestDto requestDto = MemberSignUpRequestDto.builder().email("test@gmail.com").nickname("test").age(18).password("test1234@").build();
-        MemberSignUpRequestDto requestDto2 = MemberSignUpRequestDto.builder().email("test@gmail.com").nickname("test").age(18).password("test1234@").build();
+        MemberSignUpRequestDto requestDto = makeMemberSignUpDto();
+        MemberSignUpRequestDto requestDto2 = makeMemberSignUpDto();
 
         //when
         memberService.join(requestDto);
@@ -84,11 +116,11 @@ class MemberServiceTest {
         //when
 
         //then
-        Assertions.assertThrows(Exception.class, ()-> memberService.join(requestDto));
-        Assertions.assertThrows(Exception.class, ()-> memberService.join(requestDto2));
-        Assertions.assertThrows(Exception.class, ()-> memberService.join(requestDto3));
-        Assertions.assertThrows(Exception.class, ()-> memberService.join(requestDto4));
+        assertThrows(Exception.class, ()-> memberService.join(requestDto));
+        assertThrows(Exception.class, ()-> memberService.join(requestDto2));
+        assertThrows(Exception.class, ()-> memberService.join(requestDto3));
+        assertThrows(Exception.class, ()-> memberService.join(requestDto4));
     }
 
-
+    //TODO : 로그인 성공, 실패 테스트 작성 전 토큰 유효성 테스트 짜기
 }
