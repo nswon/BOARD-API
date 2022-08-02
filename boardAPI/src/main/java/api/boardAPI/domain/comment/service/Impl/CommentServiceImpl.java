@@ -30,6 +30,10 @@ public class CommentServiceImpl implements CommentService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
 
+    /**
+     * 먼저 댓글을 쓸 게시글이 있는지 확인합니다.
+     * 연관관계 편의 메서드로 회원정보와 게시글을 저장합니다.
+     */
     @Transactional
     @Override
     public Long create(Long boardId, CommentCreateRequestDto requestDto) {
@@ -44,6 +48,10 @@ public class CommentServiceImpl implements CommentService {
         return comment.getId();
     }
 
+    /**
+     * 먼저 대댓글을 쓸 게시글과 댓글이 있는지 확인합니다.
+     * 연관관계 편의 메서드로 회원정보와 게시글, 부모댓글을 저장합니다.
+     */
     @Transactional
     @Override
     public Long createReComment(Long boardId, Long parentId, CommentCreateRequestDto requestDto) {
@@ -59,6 +67,9 @@ public class CommentServiceImpl implements CommentService {
         return comment.getId();
     }
 
+    /**
+     * 댓글을 전체조회합니다.
+     */
     @Override
     public List<CommentResponseDto> all() {
         return commentRepository.findAll().stream()
@@ -66,6 +77,10 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 먼저 댓글이 있는지 확인합니다.
+     * 있다면 조회합니다.
+     */
     @Override
     public CommentResponseDto detail(Long id) {
         Comment comment = validateCommentExistence(id);
@@ -74,6 +89,11 @@ public class CommentServiceImpl implements CommentService {
                 .build();
     }
 
+    /**
+     * 먼저 댓글이 있는지 확인합니다.
+     * 댓글을 쓴 작성자가 본인인지 확인합니다. 다른사람의 댓글은 수정할 수 없습니다.
+     * 댓글을 수정합니다.
+     */
     @Transactional
     @Override
     public Long update(Long id, CommentUpdateRequestDto requestDto) {
@@ -86,6 +106,11 @@ public class CommentServiceImpl implements CommentService {
         return comment.getId();
     }
 
+    /**
+     * 먼저 댓글이 있는지 확인합니다.
+     * 댓글을 쓴 작성자가 본인인지 확인합니다. 다른사람의 댓글은 삭제할 수 없습니다.
+     * 댓글을 삭제합니다. 부모댓글 삭제 시 자식 댓글도 삭제됩니다.
+     */
     @Transactional
     @Override
     public Long delete(Long id) {

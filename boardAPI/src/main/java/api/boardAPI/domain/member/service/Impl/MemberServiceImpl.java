@@ -27,6 +27,11 @@ public class MemberServiceImpl implements MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
+    /**
+     * 입력한 이메일이 이미 가입된 이메일은 아닌지 확인합니다. (이메일은 unique 해야 합니다)
+     * 가입할 수 있는 이메일이라면 저장한 후 USER 권한을 부여합니다.
+     * 비밀번호를 암호화시킵니다.
+     */
     @Transactional
     @Override
     public Long join(MemberSignUpRequestDto requestDto) {
@@ -40,6 +45,10 @@ public class MemberServiceImpl implements MemberService {
         return member.getId();
     }
 
+    /**
+     * 입력한 이메일과 비밀번호가 일치하는지 확인합니다.
+     * 맞다면 Access Token, Refresh Token 을 반환합니다.
+     */
     @Transactional
     @Override
     public String login(MemberSignInRequestDto requestDto) {
@@ -47,10 +56,12 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_SIGNUP_EMAIL));
         validateMatchedPassword(requestDto.getPassword(), member.getPassword());
 
-        String role = member.getRole().name();
-        return jwtTokenProvider.createToken(member.getUsername(), role);
+        return jwtTokenProvider.createAccessToken(member.getUsername(), member.getRole().name());
     }
 
+    /**
+     * 다른 회원을 찾습니다.
+     */
     @Override
     public MemberResponseDto findMember(Long id) {
         return memberRepository.findById(id)
@@ -58,6 +69,10 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_FOUND_MEMBER));
     }
 
+    /**
+     * 먼저 로그인을 했는지 확인합니다.
+     * 아이디와 이메일, 닉네임, 나이를 반환합니다.
+     */
     @Override
     public MemberResponseDto findMyInfo() {
         Member member = validateLoginStatus();
@@ -66,6 +81,10 @@ public class MemberServiceImpl implements MemberService {
                 .build();
     }
 
+    /**
+     * 먼저 로그인을 했는지 확인합니다.
+     * 이메일은 수정할 수 없습니다. 비밀번호 수정은 따로 빼두었습니다.
+     */
     @Transactional
     @Override
     public Long updateMember(MemberUpdateRequestDto requestDto) {
@@ -74,6 +93,10 @@ public class MemberServiceImpl implements MemberService {
         return member.getId();
     }
 
+    /**
+     * 먼저 로그인을 했는지 확인합니다.
+     * 입력한 기존의 비밀번호가 일치하는지 확인합니다.
+     */
     @Transactional
     @Override
     public Long updatePassword(String beforePassword, String afterPassword) {
@@ -86,6 +109,10 @@ public class MemberServiceImpl implements MemberService {
         return member.getId();
     }
 
+    /**
+     * 먼저 로그인을 했는지 확인합니다.
+     * 로그인을 했다면 입력한 비밀번호가 맞는지 체크합니다. 맞다면 해당 회원을 삭제합니다.
+     */
     @Transactional
     @Override
     public Long withdrawal(String checkPassword) {
@@ -98,6 +125,9 @@ public class MemberServiceImpl implements MemberService {
         return member.getId();
     }
 
+    /**
+     * 입력한 이메일과 비밀번호가 맞는지 체크합니다. 맞다면 ADMIN 권한을 부여합니다.
+     */
     @Transactional
     @Override
     public Long addAdminAuthority(MemberAdminRequestDto requestDto) {
@@ -109,6 +139,9 @@ public class MemberServiceImpl implements MemberService {
         return member.getId();
     }
 
+    /**
+     * 모든 회원들을 조회합니다.
+     */
     @Override
     public List<MemberResponseDto> allMemberList() {
         return memberRepository.findAll().stream()
@@ -116,6 +149,12 @@ public class MemberServiceImpl implements MemberService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 먼저 로그인을 했는지 확인합니다.
+     * 삭제할 회원을 찾습니다. 만약 회원이 존재하지 않다면 예외를 던집니다.
+     * 그리고 입력한 비밀번호가 일치하는지 확인합니다.
+     * 일치한다면 해당 회원을 삭제합니다.
+     */
     @Transactional
     @Override
     public Long withdrawalMember(Long memberId, String password) {

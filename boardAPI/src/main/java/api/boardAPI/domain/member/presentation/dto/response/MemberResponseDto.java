@@ -14,7 +14,6 @@ public class MemberResponseDto {
     private String nickname;
     private int age;
     private LocalDateTime createdDate;
-    private LocalDateTime modifiedDate;
 
     @Builder
     public MemberResponseDto(Member member) {
@@ -23,6 +22,5 @@ public class MemberResponseDto {
         this.nickname = member.getNickname();
         this.age = member.getAge();
         this.createdDate = member.getCreatedDate();
-        this.modifiedDate = member.getModifiedDate();
     }
 }

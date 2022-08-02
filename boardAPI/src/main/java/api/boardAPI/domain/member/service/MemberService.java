@@ -2,6 +2,7 @@ package api.boardAPI.domain.member.service;
 
 import api.boardAPI.domain.member.presentation.dto.request.*;
 import api.boardAPI.domain.member.presentation.dto.response.MemberResponseDto;
+
 import java.util.List;
 
 public interface MemberService {

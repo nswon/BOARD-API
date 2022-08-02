@@ -32,6 +32,10 @@ public class BoardServiceImpl implements BoardService {
     private final MemberRepository memberRepository;
     private final BoardQuerydslRepository boardQuerydslRepository;
 
+    /**
+     * 연관관계 편의 메서드로 회원정보를 저장합니다.
+     * 게시글을 저장합니다.
+     */
     @Transactional
     @Override
     public Long create(BoardCreateRequestDto requestDto) {
@@ -43,6 +47,9 @@ public class BoardServiceImpl implements BoardService {
         return board.getId();
     }
 
+    /**
+     * 게시글을 전체조회합니다.
+     */
     @Override
     public List<BoardResponseDto> all() {
         return boardRepository.findAll().stream()
@@ -50,6 +57,10 @@ public class BoardServiceImpl implements BoardService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 먼저 게시글이 있는지 확인합니다.
+     * 있다면 조회합니다.
+     */
     @Override
     public BoardResponseDto detail(Long id) {
         Board board = validateBoardExistence(id);
@@ -58,6 +69,11 @@ public class BoardServiceImpl implements BoardService {
                 .build();
     }
 
+    /**
+     * 먼저 게시글이 있는지 확인합니다.
+     * 게시글을 쓴 작성자가 본인인지 확인합니다. 다른 회원이 작성한 게시글은 수정할 수 없습니다.
+     * 게시글을 수정합니다.
+     */
     @Transactional
     @Override
     public Long update(Long id, BoardUpdateRequestDto requestDto) {
@@ -70,6 +86,11 @@ public class BoardServiceImpl implements BoardService {
         return board.getId();
     }
 
+    /**
+     * 게시글이 있는지 확인합니다.
+     * 게시글의 쓴 작성자가 본인인지 확인합니다. 다른 회원이 작성한 게시글은 수정할 수 없습니다.
+     * 게시글을 삭제합니다.
+     */
     @Transactional
     @Override
     public Long delete(Long id) {
@@ -82,6 +103,10 @@ public class BoardServiceImpl implements BoardService {
         return board.getId();
     }
 
+    /**
+     * 쿼리메서드를 이용해 검색합니다.
+     * %keyword%로 실행됩니다.
+     */
     @Override
     public List<BoardResponseDto> search(String keyword) {
         return boardRepository.findByTitleContaining(keyword).stream()
@@ -89,6 +114,9 @@ public class BoardServiceImpl implements BoardService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 페이징을 합니다. 한 페이지당 10개의 게시글이 보입니다.
+     */
     @Override
     public Page<BoardResponseDto> paging(int pageNum) {
         Pageable pageable = PageRequest.of(pageNum, 10);
@@ -96,6 +124,11 @@ public class BoardServiceImpl implements BoardService {
                 .map(BoardResponseDto::new);
     }
 
+    /**
+     * Querydsl 을 이용해 검색합니다.
+     * 제목과 작성자의 닉네임으로 검색할 수 있으며,
+     * %title%, nickname 으로 실행됩니다.
+     */
     @Override
     public List<BoardResponseDto> findByBoard(String keyword) {
         return boardQuerydslRepository.findBoardByTitleAndWriter(keyword).stream()

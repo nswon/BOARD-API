@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
@@ -24,16 +25,20 @@ public class JwtTokenProvider {
     @Value("spring.jwt.secret")
     private String secretKey;
 
-    private long tokenValidTime = 1440 * 60 * 7 * 1000L;
+    private long tokenValidTime = 1000L * 60 * 30; //30분
+
+    private long refreshTokenValidTime = 1000L * 60 * 60 * 24 * 7; //일주일
+
     private final CustomUserDetailsService customUserDetailsService;
-    public static final String AUTHORIZATION_HEADER = "X-AUTH-TOKEN";
+    public static final String HEADER_ACCESS_TOKEN = "X-ACCESS-TOKEN";
+    public static final String HEADER_REFRESH_TOKEN = "X-REFRESH-TOKEN";
 
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(String email, String role) {
+    public String createAccessToken(String email, String role) {
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("role", role);
         Date now = new Date();
@@ -45,8 +50,21 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    /**
+     * Refresh Token 을 생성합니다
+     * 오직 Access Token 을 재발급 해주는 용도이기 때문에 발급시간과 유효시간만 들어갑니다.
+     */
+    public String createRefreshToken() {
+        Date now = new Date();
+        return Jwts.builder()
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + refreshTokenValidTime))
+                .signWith(SignatureAlgorithm.ES256, secretKey)
+                .compact();
+    }
+
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(this.getUserEmail(token));
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(getUserEmail(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
@@ -54,9 +72,15 @@ public class JwtTokenProvider {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public String resolveToken(HttpServletRequest request) {
-        log.info("헤더에서 받아온 토큰 값 = " + request.getHeader(AUTHORIZATION_HEADER));
-        return request.getHeader(AUTHORIZATION_HEADER);
+    public String resolveAccessToken(HttpServletRequest request) {
+        return request.getHeader(HEADER_ACCESS_TOKEN);
+    }
+
+    /**
+     * 헤더에서 Refresh Token 을 얻어옵니다.
+     */
+    public String resolveRefreshToken(HttpServletRequest request) {
+        return request.getHeader(HEADER_REFRESH_TOKEN);
     }
 
     public boolean validateToken(String jwtToken) {
