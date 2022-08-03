@@ -61,9 +61,11 @@ public class BoardServiceImpl implements BoardService {
      * 먼저 게시글이 있는지 확인합니다.
      * 있다면 조회합니다.
      */
+    @Transactional
     @Override
     public BoardResponseDto detail(Long id) {
         Board board = validateBoardExistence(id);
+        boardRepository.updateView(board.getId());
         return BoardResponseDto.builder()
                 .board(board)
                 .build();

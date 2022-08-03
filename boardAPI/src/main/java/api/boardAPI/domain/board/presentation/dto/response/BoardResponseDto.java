@@ -14,6 +14,7 @@ public class BoardResponseDto {
     private String title;
     private String content;
     private String writer;
+    private int view;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
@@ -23,6 +24,7 @@ public class BoardResponseDto {
         this.title = board.getTitle();
         this.content = board.getContent();
         this.writer = board.getWriter().getNickname();
+        this.view = board.getView();
         this.createdDate = board.getCreatedDate();
         this.modifiedDate = board.getModifiedDate();
     }
