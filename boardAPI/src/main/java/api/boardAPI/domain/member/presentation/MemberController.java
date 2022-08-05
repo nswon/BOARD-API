@@ -2,11 +2,14 @@ package api.boardAPI.domain.member.presentation;
 
 import api.boardAPI.domain.member.presentation.dto.request.*;
 import api.boardAPI.domain.member.presentation.dto.response.MemberResponseDto;
+import api.boardAPI.domain.member.presentation.dto.response.TokenResponseDto;
 import api.boardAPI.domain.member.service.MemberService;
 import api.boardAPI.global.wrap.Wrap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -23,8 +26,14 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody @Valid MemberSignInRequestDto requestDto) {
+    public TokenResponseDto login(@RequestBody @Valid MemberSignInRequestDto requestDto) {
         return memberService.login(requestDto);
+    }
+
+    //TODO : Access Token 이 만료가 되면 여기로 요청을 보냄
+    @PutMapping("/newAccess")
+    public TokenResponseDto issueAccessToken(HttpServletRequest request) {
+        return memberService.issueAccessToken(request);
     }
 
     @GetMapping("/find/{id}")

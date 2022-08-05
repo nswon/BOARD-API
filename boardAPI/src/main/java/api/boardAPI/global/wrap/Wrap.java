@@ -7,5 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class Wrap<T> {
 
-    private T wrap;
+    private T data;
 }

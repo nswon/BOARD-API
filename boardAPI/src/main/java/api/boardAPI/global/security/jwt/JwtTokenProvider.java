@@ -1,9 +1,6 @@
 package api.boardAPI.global.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,9 +22,9 @@ public class JwtTokenProvider {
     @Value("spring.jwt.secret")
     private String secretKey;
 
-    private long tokenValidTime = 1000L * 60 * 30; //30분
+    private long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 30; //30분
 
-    private long refreshTokenValidTime = 1000L * 60 * 60 * 24 * 7; //일주일
+    private long REFRESH_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 7; //일주일
 
     private final CustomUserDetailsService customUserDetailsService;
     public static final String HEADER_ACCESS_TOKEN = "X-ACCESS-TOKEN";
@@ -45,21 +42,17 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + tokenValidTime))
+                .setExpiration(new Date(now.getTime() + ACCESS_TOKEN_VALID_TIME))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
-    /**
-     * Refresh Token 을 생성합니다
-     * 오직 Access Token 을 재발급 해주는 용도이기 때문에 발급시간과 유효시간만 들어갑니다.
-     */
     public String createRefreshToken() {
         Date now = new Date();
         return Jwts.builder()
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + refreshTokenValidTime))
-                .signWith(SignatureAlgorithm.ES256, secretKey)
+                .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_VALID_TIME))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
@@ -76,17 +69,27 @@ public class JwtTokenProvider {
         return request.getHeader(HEADER_ACCESS_TOKEN);
     }
 
-    /**
-     * 헤더에서 Refresh Token 을 얻어옵니다.
-     */
     public String resolveRefreshToken(HttpServletRequest request) {
         return request.getHeader(HEADER_REFRESH_TOKEN);
     }
 
-    public boolean validateToken(String jwtToken) {
+    public boolean validateAccessToken(String accessToken) {
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
-            return !claims.getBody().getExpiration().before(new Date());
+            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(accessToken);
+            return claims.getBody().getExpiration().before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean validateRefreshToken(String refreshToken) {
+        try {
+            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(refreshToken);
+            return claims.getBody().getExpiration().before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
         } catch (Exception e) {
             return false;
         }

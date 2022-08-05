@@ -44,6 +44,8 @@ public class Member extends BaseTimeEntity implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    private String refreshToken;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -118,6 +120,10 @@ public class Member extends BaseTimeEntity implements UserDetails {
 
     public boolean matchPassword(PasswordEncoder passwordEncoder, String checkPassword) {
         return passwordEncoder.matches(checkPassword, getPassword());
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
 }

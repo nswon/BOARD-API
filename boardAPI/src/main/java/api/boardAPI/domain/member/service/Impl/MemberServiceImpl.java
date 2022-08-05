@@ -6,6 +6,7 @@ import api.boardAPI.domain.member.exception.MemberException;
 import api.boardAPI.domain.member.exception.MemberExceptionType;
 import api.boardAPI.domain.member.presentation.dto.request.*;
 import api.boardAPI.domain.member.presentation.dto.response.MemberResponseDto;
+import api.boardAPI.domain.member.presentation.dto.response.TokenResponseDto;
 import api.boardAPI.domain.member.service.MemberService;
 import api.boardAPI.global.security.jwt.JwtTokenProvider;
 import api.boardAPI.global.security.jwt.SecurityUtil;
@@ -14,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,15 +51,64 @@ public class MemberServiceImpl implements MemberService {
     /**
      * 입력한 이메일과 비밀번호가 일치하는지 확인합니다.
      * 맞다면 Access Token, Refresh Token 을 반환합니다.
+     * 이 때, Refresh Token 은 DB에 저장합니다.
      */
     @Transactional
     @Override
-    public String login(MemberSignInRequestDto requestDto) {
+    public TokenResponseDto login(MemberSignInRequestDto requestDto) {
         Member member = memberRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_SIGNUP_EMAIL));
         validateMatchedPassword(requestDto.getPassword(), member.getPassword());
 
-        return jwtTokenProvider.createAccessToken(member.getUsername(), member.getRole().name());
+        //TODO : Access Token 과 Refresh Token 을 생성합니다.
+        String accessToken = jwtTokenProvider.createAccessToken(member.getUsername(), member.getRole().name());
+        String refreshToken = jwtTokenProvider.createRefreshToken();
+
+        //TODO : Refresh Token 을 DB에 저장합니다.
+        member.updateRefreshToken(refreshToken);
+        memberRepository.save(member);
+
+        return TokenResponseDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    @Transactional
+    @Override
+    public TokenResponseDto issueAccessToken(HttpServletRequest request) {
+        //TODO : 만료된 accessToken 과 refreshToken 을 가져옴
+        String accessToken = jwtTokenProvider.resolveAccessToken(request);
+        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
+
+        //TODO : accessToken 이 만료되었으면
+        if(jwtTokenProvider.validateAccessToken(accessToken)) {
+            log.info("access 토큰 만료됨");
+            //TODO : 만약 refreshToken 이 유효하다면
+            if(jwtTokenProvider.validateRefreshToken(refreshToken)) {
+                log.info("refresh Token 은 유효합니다.");
+
+                //TODO : DB에 저장해두었던 refreshToken 을 불러오고 새로운 Access Token 을 생성하기 위함
+                Member member = memberRepository.findByEmail(jwtTokenProvider.getUserEmail(refreshToken))
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+
+                //TODO : 만약 DB refreshToken 와 요청한 refreshToken 가 같다면
+                if(refreshToken.equals(member.getRefreshToken())) {
+                    //TODO : 새로운 accessToken 생성
+                    accessToken = jwtTokenProvider.createAccessToken(member.getEmail(), member.getRole().name());
+                }
+                else {
+                    log.info("토큰이 변조되었습니다.");
+                }
+            }
+            else {
+                log.info("Refresh Token 이 유효하지 않습니다.");
+            }
+        }
+        return TokenResponseDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     /**
